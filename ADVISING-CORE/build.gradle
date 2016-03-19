@@ -1,0 +1,19 @@
+group 'com.vana.advising.core'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+   // compile gradleAPI()
+    compile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile files('/Users/Mac-Book-Pro/work/VCF-FRAMEWORK/VCF-CORE/build/classes')
+
+}

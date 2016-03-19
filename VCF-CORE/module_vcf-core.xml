@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_vcf-core" default="compile.module.vcf-core">
+  <dirname property="module.vcf-core.basedir" file="${ant.file.module_vcf-core}"/>
+  
+  <property name="module.jdk.home.vcf-core" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.vcf-core" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.vcf-core" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.vcf-core" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="vcf-core.output.dir" value="${module.vcf-core.basedir}/build/classes/main"/>
+  <property name="vcf-core.testoutput.dir" value="${module.vcf-core.basedir}/build/classes/test"/>
+  
+  <path id="vcf-core.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="vcf-core.module.production.classpath">
+    <path refid="${module.jdk.classpath.vcf-core}"/>
+    <path refid="library.gradle:_org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.4.1.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="vcf-core.runtime.production.module.classpath">
+    <pathelement location="${vcf-core.output.dir}"/>
+    <path refid="library.gradle:_org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.4.1.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="vcf-core.module.classpath">
+    <path refid="${module.jdk.classpath.vcf-core}"/>
+    <pathelement location="${vcf-core.output.dir}"/>
+    <path refid="library.gradle:_org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.4.1.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="vcf-core.runtime.module.classpath">
+    <pathelement location="${vcf-core.testoutput.dir}"/>
+    <pathelement location="${vcf-core.output.dir}"/>
+    <path refid="library.gradle:_org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.4.1.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.vcf-core">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.vcf-core">
+    <patternset refid="excluded.from.module.vcf-core"/>
+  </patternset>
+  
+  <path id="vcf-core.module.sourcepath">
+    <dirset dir="${module.vcf-core.basedir}">
+      <include name="src/main/groovy"/>
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  <path id="vcf-core.module.test.sourcepath">
+    <dirset dir="${module.vcf-core.basedir}">
+      <include name="src/test/groovy"/>
+      <include name="src/test/java"/>
+      <include name="src/test/resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.vcf-core" depends="compile.module.vcf-core.production,compile.module.vcf-core.tests" description="Compile module VCF-CORE"/>
+  
+  <target name="compile.module.vcf-core.production" depends="register.custom.compilers" description="Compile module VCF-CORE; production classes">
+    <mkdir dir="${vcf-core.output.dir}"/>
+    <groovyc destdir="${vcf-core.output.dir}" fork="yes">
+      <src refid="vcf-core.module.sourcepath"/>
+      <classpath refid="vcf-core.module.production.classpath"/>
+      <patternset refid="excluded.from.compilation.vcf-core"/>
+      <javac debug="${compiler.debug}">
+        <compilerarg line="${compiler.args.vcf-core}"/>
+      </javac>
+    </groovyc>
+    <instrumentIdeaExtensions destdir="${vcf-core.output.dir}">
+      <compilerarg line="${compiler.args.vcf-core}"/>
+      <bootclasspath refid="vcf-core.module.bootclasspath"/>
+      <classpath refid="vcf-core.module.production.classpath"/>
+      <src refid="vcf-core.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.vcf-core"/>
+    </instrumentIdeaExtensions>
+    
+    <copy todir="${vcf-core.output.dir}">
+      <fileset dir="${module.vcf-core.basedir}/src/main/groovy">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.vcf-core.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.vcf-core.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.vcf-core.tests" depends="register.custom.compilers,compile.module.vcf-core.production" description="compile module VCF-CORE; test classes" unless="skip.tests">
+    <mkdir dir="${vcf-core.testoutput.dir}"/>
+    <groovyc destdir="${vcf-core.testoutput.dir}" fork="yes">
+      <src refid="vcf-core.module.test.sourcepath"/>
+      <classpath refid="vcf-core.module.classpath"/>
+      <patternset refid="excluded.from.compilation.vcf-core"/>
+      <javac debug="${compiler.debug}">
+        <compilerarg line="${compiler.args.vcf-core}"/>
+      </javac>
+    </groovyc>
+    <instrumentIdeaExtensions destdir="${vcf-core.testoutput.dir}">
+      <compilerarg line="${compiler.args.vcf-core}"/>
+      <bootclasspath refid="vcf-core.module.bootclasspath"/>
+      <classpath refid="vcf-core.module.classpath"/>
+      <src refid="vcf-core.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.vcf-core"/>
+    </instrumentIdeaExtensions>
+    
+    <copy todir="${vcf-core.testoutput.dir}">
+      <fileset dir="${module.vcf-core.basedir}/src/test/groovy">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.vcf-core.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.vcf-core.basedir}/src/test/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.vcf-core" description="cleanup module">
+    <delete dir="${vcf-core.output.dir}"/>
+    <delete dir="${vcf-core.testoutput.dir}"/>
+  </target>
+</project>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_advising-core" default="compile.module.advising-core">
+  <dirname property="module.advising-core.basedir" file="${ant.file.module_advising-core}"/>
+  
+  <property name="module.jdk.home.advising-core" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.advising-core" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.advising-core" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.advising-core" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="advising-core.output.dir" value="${module.advising-core.basedir}/build/classes/main"/>
+  <property name="advising-core.testoutput.dir" value="${module.advising-core.basedir}/build/classes/test"/>
+  
+  <path id="advising-core.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="advising-core.module.production.classpath">
+    <path refid="${module.jdk.classpath.advising-core}"/>
+    <path refid="library.org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <pathelement location="${vcf-core.output.dir}"/>
+  </path>
+  
+  <path id="advising-core.runtime.production.module.classpath">
+    <pathelement location="${advising-core.output.dir}"/>
+    <path refid="library.org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <path refid="vcf-core.runtime.production.module.classpath"/>
+  </path>
+  
+  <path id="advising-core.module.classpath">
+    <path refid="${module.jdk.classpath.advising-core}"/>
+    <pathelement location="${advising-core.output.dir}"/>
+    <path refid="library.org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <pathelement location="${vcf-core.testoutput.dir}"/>
+    <pathelement location="${vcf-core.output.dir}"/>
+  </path>
+  
+  <path id="advising-core.runtime.module.classpath">
+    <pathelement location="${advising-core.testoutput.dir}"/>
+    <pathelement location="${advising-core.output.dir}"/>
+    <path refid="library.org.spockframework:spock-core:1.0-groovy-2.4.classpath"/>
+    <path refid="vcf-core.runtime.module.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.advising-core">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.advising-core">
+    <patternset refid="excluded.from.module.advising-core"/>
+  </patternset>
+  
+  <path id="advising-core.module.sourcepath">
+    <dirset dir="${module.advising-core.basedir}">
+      <include name="src/main/groovy"/>
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  <path id="advising-core.module.test.sourcepath">
+    <dirset dir="${module.advising-core.basedir}">
+      <include name="src/test/groovy"/>
+      <include name="src/test/java"/>
+      <include name="src/test/resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.advising-core" depends="compile.module.advising-core.production,compile.module.advising-core.tests" description="Compile module ADVISING-CORE"/>
+  
+  <target name="compile.module.advising-core.production" depends="register.custom.compilers,compile.module.vcf-core" description="Compile module ADVISING-CORE; production classes">
+    <mkdir dir="${advising-core.output.dir}"/>
+    <groovyc destdir="${advising-core.output.dir}" fork="yes">
+      <src refid="advising-core.module.sourcepath"/>
+      <classpath refid="advising-core.module.production.classpath"/>
+      <patternset refid="excluded.from.compilation.advising-core"/>
+      <javac debug="${compiler.debug}">
+        <compilerarg line="${compiler.args.advising-core}"/>
+      </javac>
+    </groovyc>
+    <instrumentIdeaExtensions destdir="${advising-core.output.dir}">
+      <compilerarg line="${compiler.args.advising-core}"/>
+      <bootclasspath refid="advising-core.module.bootclasspath"/>
+      <classpath refid="advising-core.module.production.classpath"/>
+      <src refid="advising-core.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.advising-core"/>
+    </instrumentIdeaExtensions>
+    
+    <copy todir="${advising-core.output.dir}">
+      <fileset dir="${module.advising-core.basedir}/src/main/groovy">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.advising-core.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.advising-core.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.advising-core.tests" depends="register.custom.compilers,compile.module.advising-core.production" description="compile module ADVISING-CORE; test classes" unless="skip.tests">
+    <mkdir dir="${advising-core.testoutput.dir}"/>
+    <groovyc destdir="${advising-core.testoutput.dir}" fork="yes">
+      <src refid="advising-core.module.test.sourcepath"/>
+      <classpath refid="advising-core.module.classpath"/>
+      <patternset refid="excluded.from.compilation.advising-core"/>
+      <javac debug="${compiler.debug}">
+        <compilerarg line="${compiler.args.advising-core}"/>
+      </javac>
+    </groovyc>
+    <instrumentIdeaExtensions destdir="${advising-core.testoutput.dir}">
+      <compilerarg line="${compiler.args.advising-core}"/>
+      <bootclasspath refid="advising-core.module.bootclasspath"/>
+      <classpath refid="advising-core.module.classpath"/>
+      <src refid="advising-core.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.advising-core"/>
+    </instrumentIdeaExtensions>
+    
+    <copy todir="${advising-core.testoutput.dir}">
+      <fileset dir="${module.advising-core.basedir}/src/test/groovy">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.advising-core.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.advising-core.basedir}/src/test/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.advising-core" description="cleanup module">
+    <delete dir="${advising-core.output.dir}"/>
+    <delete dir="${advising-core.testoutput.dir}"/>
+  </target>
+</project>
